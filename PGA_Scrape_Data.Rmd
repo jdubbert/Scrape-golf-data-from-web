@@ -33,7 +33,7 @@ knitr::opts_chunk$set(fig.align="center",
 This markdown file scrapes the PGA Tour website for the desired statistics that will be used for analysis and creates a single data frame that includes all 18 stats for 463 players.
 
 ## Variables
-Each of the below variables is created for the years 2010:2018. (ie. top10_2018, top10_2017, etc.)
+Each of the below variables is created for the years 2005:2018.
 ```{r}
 ## Create function to get definitions for each variable from PGA website
 get_variable_defintions <- function(stat){
@@ -87,7 +87,6 @@ get_variable_defintions(127)
 ```{r}
 print("Total number of 1st places")
 ```
-
 12. `putts_round`
 ```{r}
 get_variable_defintions(119)
@@ -96,34 +95,33 @@ get_variable_defintions(119)
 ```{r}
 get_variable_defintions(130)
 ```
-15. `par5_SA`
+14. `par5_SA`
 ```{r}
 get_variable_defintions(144)
 ```
-16. `masters_appear`
-```{r}
-print("Total number of Masters Appearances")
-```
-
-17. `bounce_back`
+15. `bounce_back`
 ```{r}
 get_variable_defintions(160)
 ```
-18. `driving_accuracy`
+16. `driving_accuracy`
 ```{r}
 get_variable_defintions(102)
 ```
-19. `hole_proximity`
+17. `hole_proximity`
 ```{r}
 get_variable_defintions(331)
 ```
-20. `masters_finish`
+18. `masters_finish`
 ```{r}
 print("Finish position in Masters tournament")
 ```
-21. `masters_players`
+19. `masters_players`
 ```{r}
 print("Players who have played in at least one Masters tournament")
+```
+20. `wgr`
+```{r}
+print("World Golf Ranking in Week 13 - the week before Masters tournament")
 ```
 
 ## PGA Tour Web Scraper
@@ -148,7 +146,7 @@ get_all_data <- function(stat, year = 2018){
 
 ##Get Ranking `ranking`
 ```{r}
-rank_list <- lapply(2010:2018, get_all_data, stat="127")
+rank_list <- lapply(2005:2018, get_all_data, stat="127")
 rank_indx <- lengths(rank_list)
 ranking_all <- as.data.frame(do.call(rbind,lapply(rank_list, `length<-`, max(rank_indx))))
 ranking_all <- subset(ranking_all, select = c("Year", "PLAYER.NAME", "RANK.THIS.WEEK")) %>% clean_names() 
@@ -157,7 +155,7 @@ names(ranking_all)[names(ranking_all)=="rank_this_week"] <- "ranking"
 
 ## Get Top 10 Finishes and Wins `top_10` `wins`
 ```{r}
-top10_list <- lapply(2010:2018, get_all_data, stat="138")
+top10_list <- lapply(2005:2018, get_all_data, stat="138")
 top10_indx <- lengths(top10_list)
 top10_all <- as.data.frame(do.call(rbind,lapply(top10_list, `length<-`, max(top10_indx))))
 top10_all <- subset(top10_all, select = c("Year", "PLAYER.NAME", "TOP.10", "X1ST")) %>% clean_names() 
@@ -166,7 +164,7 @@ names(top10_all)[names(top10_all)=="x1st"] <- "wins"
 
 ## Get Scoring Average & Rounds `score_average` `rounds`
 ```{r}
-sa_list <- lapply(2010:2018, get_all_data, stat="120")
+sa_list <- lapply(2005:2018, get_all_data, stat="120")
 sa_indx <- lengths(sa_list)
 score_avg_all <- as.data.frame(do.call(rbind,lapply(sa_list, `length<-`, max(sa_indx))))
 score_avg_all <- subset(score_avg_all, select = c("Year", "PLAYER.NAME", "AVG", "ROUNDS")) %>% clean_names() 
@@ -175,7 +173,7 @@ names(score_avg_all)[names(score_avg_all)=="avg"] <- "score_average"
 
 ## Get Strokes Gained Stats `sg_total`
 ```{r}
-sg_list <- lapply(2010:2018, get_all_data, stat="02675")
+sg_list <- lapply(2005:2018, get_all_data, stat="02675")
 sg_indx <- lengths(sg_list)
 strokes_gained_all <- as.data.frame(do.call(rbind,lapply(sg_list, `length<-`, max(sg_indx))))
 tstrokes_gained_all <- subset(strokes_gained_all, select = c("Year", "PLAYER.NAME", "AVERAGE")) %>% clean_names() 
@@ -183,7 +181,7 @@ names(tstrokes_gained_all)[names(tstrokes_gained_all)=="average"] <- "sg_total"
 ```
 ##`sg_t2g`
 ```{r}
-sg_t2g_list <- lapply(2010:2018, get_all_data, stat="02674")
+sg_t2g_list <- lapply(2005:2018, get_all_data, stat="02674")
 sg_t2g_indx <- lengths(sg_t2g_list)
 sg_t2g_all <- as.data.frame(do.call(rbind,lapply(sg_t2g_list, `length<-`, max(sg_t2g_indx))))
 sg_t2g_all <- subset(sg_t2g_all, select = c("Year", "PLAYER.NAME", "AVERAGE")) %>% clean_names() 
@@ -191,10 +189,10 @@ names(sg_t2g_all)[names(sg_t2g_all)=="average"] <- "sg_t2g"
 ```
 ##`sg_putt`
 ```{r}
-sg_putt_list <- lapply(2010:2018, get_all_data, stat="02564")
+sg_putt_list <- lapply(2005:2018, get_all_data, stat="02564")
 sg_putt_indx <- lengths(sg_putt_list)
 one <- names(sg_putt_list[[1]])
-names(sg_putt_list[[1]]) <- c(one[1:8], "TOTAL.SG.PUTTING", one[10])
+names(sg_putt_list[[6]]) <- c(one[1:8], "TOTAL.SG.PUTTING", one[10])
 sg_putt_all <- as.data.frame(do.call(rbind,lapply(sg_putt_list, `length<-`, max(sg_putt_indx))))
 sg_putt_all <- subset(sg_putt_all, select = c("Year", "PLAYER.NAME", "AVERAGE")) %>% clean_names() 
 names(sg_putt_all)[names(sg_putt_all)=="average"] <- "sg_putt"
@@ -202,7 +200,7 @@ names(sg_putt_all)[names(sg_putt_all)=="average"] <- "sg_putt"
 
 ## Get Driving Distance `driving_distance`
 ```{r}
-d_list <- lapply(2010:2018, get_all_data, stat="101")
+d_list <- lapply(2005:2018, get_all_data, stat="101")
 d_indx <- lengths(d_list)
 driving_distance_all <- as.data.frame(do.call(rbind,lapply(d_list, `length<-`, max(d_indx))))
 driving_distance_all <- subset(driving_distance_all, select = c("Year", "PLAYER.NAME", "AVG.")) %>% clean_names() 
@@ -211,7 +209,7 @@ names(driving_distance_all)[names(driving_distance_all)=="avg"] <- "driving_dist
 
 ## Get Greens in Regulation (GIR) % `gir`
 ```{r}
-gir_list <- lapply(2010:2018, get_all_data, stat="103")
+gir_list <- lapply(2005:2018, get_all_data, stat="103")
 gir_indx <- lengths(gir_list)
 gir_all <- as.data.frame(do.call(rbind, lapply(gir_list, `length<-`, max(gir_indx))))
 gir_all <- subset(gir_all, select = c("Year", "PLAYER.NAME", "X.")) %>%  clean_names()
@@ -220,7 +218,7 @@ names(gir_all)[names(gir_all)=="x"] <- "gir"
 
 ## Get average putts per round `putts_round`
 ```{r}
-putts_list <- lapply(2010:2018, get_all_data, stat="119")
+putts_list <- lapply(2005:2018, get_all_data, stat="119")
 putts_indx <- lengths(putts_list)
 putts_all <- as.data.frame(do.call(rbind, lapply(putts_list, `length<-`, max(putts_indx))))
 putts_all <- subset(putts_all, select = c("Year", "PLAYER.NAME", "AVG")) %>%  clean_names()
@@ -229,7 +227,7 @@ names(putts_all)[names(putts_all)=="avg"] <- "putts_round"
 
 ## Get par 5 scoring average `par5_SA`
 ```{r}
-five_list <- lapply(2010:2018, get_all_data, stat="144")
+five_list <- lapply(2005:2018, get_all_data, stat="144")
 five_indx <- lengths(five_list)
 five_all <- as.data.frame(do.call(rbind, lapply(five_list, `length<-`, max(five_indx))))
 five_all <- subset(five_all, select = c("Year", "PLAYER.NAME", "AVG")) %>%  clean_names()
@@ -238,7 +236,7 @@ names(five_all)[names(five_all)=="avg"] <- "par5_SA"
 
 ## Get bounce back `bounce_back`
 ```{r}
-bb_list <- lapply(2010:2018, get_all_data, stat="160")
+bb_list <- lapply(2005:2018, get_all_data, stat="160")
 bb_indx <- lengths(bb_list)
 bb_all <- as.data.frame(do.call(rbind, lapply(bb_list, `length<-`, max(bb_indx))))
 bb_all <- subset(bb_all, select = c("Year", "PLAYER.NAME", "X.")) %>%  clean_names()
@@ -247,7 +245,7 @@ names(bb_all)[names(bb_all)=="x"] <- "bounce_back"
 
 ## Get driving accuracy `driving_accuracy`
 ```{r}
-da_list <- lapply(2010:2018, get_all_data, stat="102")
+da_list <- lapply(2005:2018, get_all_data, stat="102")
 da_indx <- lengths(da_list)
 da_all <- as.data.frame(do.call(rbind, lapply(da_list, `length<-`, max(da_indx))))
 da_all <- subset(da_all, select = c("Year", "PLAYER.NAME", "X.")) %>%  clean_names()
@@ -256,7 +254,7 @@ names(da_all)[names(da_all)=="x"] <- "driving_accuracy"
 
 ## Get proximity to hole `hole_proximity`
 ```{r}
-p_list <- lapply(2010:2018, get_all_data, stat="374")
+p_list <- lapply(2005:2018, get_all_data, stat="374")
 p_indx <- lengths(p_list)
 p_all <- as.data.frame(do.call(rbind, lapply(p_list, `length<-`, max(p_indx))))
 p_all <- subset(p_all, select = c("Year", "PLAYER.NAME", "TOTAL.DISTANCE..FEET.")) %>%  clean_names()
@@ -265,7 +263,7 @@ names(p_all)[names(p_all)=="total_distance_feet"] <- "hole_proximity"
 
 ## Get scrambling % `scramble`
 ```{r}
-s_list <- lapply(2010:2018, get_all_data, stat="130")
+s_list <- lapply(2005:2018, get_all_data, stat="130")
 s_indx <- lengths(s_list)
 s_all <- as.data.frame(do.call(rbind, lapply(s_list, `length<-`, max(s_indx))))
 s_all <- subset(s_all, select = c("Year", "PLAYER.NAME", "X.")) %>%  clean_names()
@@ -310,7 +308,6 @@ m_all <- as.data.frame(do.call(rbind, lapply(m_list, `length<-`, max(m_indx))))
 masters_all <- subset(m_all, select = c("Player", "Year", "Finish")) %>%  clean_names()
 names(masters_all)[names(masters_all)=="finish"] <- "masters_finish"
 names(masters_all)[names(masters_all)=="player"] <- "player_name"
-masters_all$count <- 1
 ```
 
 ## Players who have played in masters `masters_players`
@@ -318,33 +315,25 @@ masters_all$count <- 1
 masters_players <- as.data.frame(masters_all$player)
 ```
 
-## Get number of Masters Apperances
-```{r}
-m1 <- rep(NA)
-player <- c("Matt Kuchar", "Retief Goosen")
-names(player)[names(player)=="player_name"] <- "player"
-m1 <- cbind(m1, player)
-for (i in player) {
-  masters_count <-masters_all %>% filter(player==i) %>% count(count)
-  print(masters_count)
-}
-```
 
 ## Merge all stats
 ```{r}
-ab <- merge(merge(ranking_all, top10_all, by = c("player_name", "year"), all = TRUE), score_avg_all, by = c("player_name", "year"), all = TRUE)
-abc <- merge(all_ab, bb_all, by = c("player_name", "year"), all=TRUE)
-abcd <- merge(abc, da_all, by = c("player_name", "year"), all=TRUE)
-abcde <- merge(abcd, driving_distance_all, by = c("player_name", "year"), all=TRUE)
-abcdef <- merge(abcde, five_all, by = c("player_name", "year"), all=TRUE)
-abcdefg <- merge(abcdef, gir_all, by = c("player_name", "year"), all=TRUE)
-abcdefgh <- merge(abcdefg, p_all, by = c("player_name", "year"), all=TRUE)
-abcdefghi <- merge(abcdefgh, putts_all, by = c("player_name", "year"), all=TRUE)
-abcdefghij <- merge(abcdefghi, s_all, by = c("player_name", "year"), all=TRUE)
-abcdefghijk <- merge(abcdefghij, sg_putt_all, by = c("player_name", "year"), all=TRUE)
-abcdefghijkl <- merge(abcdefghijk, sg_t2g_all, by = c("player_name", "year"), all=TRUE)
-all_data <- merge(abcdefghijkl, tstrokes_gained_all, by = c("player_name", "year"), all=TRUE)
+all_data <- left_join(ranking_all, top10_all, by =c("player_name", "year")) %>% 
+  left_join(score_avg_all, by=c("player_name", "year")) %>% 
+  left_join(bb_all, by=c("player_name", "year")) %>% 
+  left_join(da_all, by=c("player_name", "year")) %>% 
+  left_join(driving_distance_all, by=c("player_name", "year")) %>% 
+  left_join(five_all, by=c("player_name", "year")) %>% 
+  left_join(gir_all, by=c("player_name", "year")) %>% 
+  left_join(p_all, by=c("player_name", "year")) %>% ## here
+  left_join(putts_all, by=c("player_name", "year")) %>% 
+  left_join(s_all, by=c("player_name", "year")) %>% 
+  left_join(sg_putt_all, by=c("player_name", "year")) %>% 
+  left_join(sg_t2g_all, by=c("player_name", "year")) %>% 
+  left_join(masters_all, by=c("player_name", "year")) %>% 
+  left_join(tstrokes_gained_all, by=c("player_name", "year"))
 
+all_data <- all_data[!(all_data$player_name=="Richard Johnson"),]
 
 all_data <- all_data %>% arrange(player_name, year)
 ## Change NAs in wins and top 10 to 0 for binary
@@ -354,9 +343,23 @@ all_data$top_10[is.na(all_data$top_10)] <- 0
 
 ## Create csv file
 ```{r}
-write.csv(all_data, file = "pga_all_data.csv") 
+write.csv(all_data, file = "pga_all_data3.csv") 
 ```
 
+```{r}
+all_data <- read.csv("pga_all_data3.csv")
+all_data <- all_data[,-1]
+```
+
+```{r}
+wgr_data <- read.csv("wgr_golf_rank.csv")
+wgr_data <- wgr_data[,-1]
+```
+
+```{r}
+pga_data <- left_join(all_data, wgr_data, by = c("player_name", "year"))
+write.csv(pga_data, "pga_data_all.csv")
+```
 
 
 
